@@ -1,0 +1,315 @@
+from m5stack import *
+from m5stack_ui import *
+from uiflow import *
+from machine import Pin
+from time import sleep
+
+screen = M5Screen()
+screen.clean_screen()
+screen.set_screen_bg_color(0x1941a2)
+
+label0 = M5Label('START', x=34, y=212, color=0xea0909, font=FONT_MONT_16, parent=None)
+label2 = M5Label('VOLTS', x=21, y=51, color=0xfaf8f8, font=FONT_MONT_20, parent=None)
+label3 = M5Label('OHMS', x=25, y=126, color=0xf5f2f2, font=FONT_MONT_20, parent=None)
+label4 = M5Label('0.0', x=160, y=45, color=0xf8f7f7, font=FONT_MONT_34, parent=None)
+label6 = M5Label('0.0', x=157, y=118, color=0xffffff, font=FONT_MONT_36, parent=None)
+
+adc1 = machine.ADC(36) #measuring carbon
+adc0 = machine.ADC(35) #charging capacitors
+adc0.atten(machine.ADC.ATTN_11DB) #full 3.6V
+adc0.width(machine.ADC.WIDTH_12BIT)
+adc1.atten(machine.ADC.ATTN_11DB) #full 3.6V
+adc1.width(machine.ADC.WIDTH_12BIT) #full 4035 widhh
+
+#settings
+StepPin = Pin(14, Pin.OUT) #Pin used for Stepping motor
+DirPin = Pin(21, Pin.OUT) #Pin used to set motor direction
+p1 = Pin(13, Pin.OUT) # Charging
+p2 = Pin(19, Pin.OUT) # Fire
+p3 = Pin(22, Pin.OUT) #Measuring circuit
+a1 = Pin(1, Pin.OUT) #bottom rod
+
+goUp = 1000 # up
+volt = 1800 # ADC0 Setting Capacitor charge
+
+# Diffrent resistivity
+
+resist = 1400 # ADC1 Setting for resistivity
+resist2 = 1800
+resist3 = 2200
+
+runOneTime = 1
+loop1 = 1
+
+# Program Starts
+p1.value(0)
+p2.value(0)
+p3.value(1)
+a1.value(1)
+
+def buttonA_wasPressed():
+  
+  
+  p1.value(1)
+  p2.value(0)
+  # connect relays
+  p3.value(1)
+  
+  
+  #Measuring charge
+  
+  for x in range(runOneTime):
+    
+    label4.setText(str(adc0.read()))
+    
+    while 1:
+      label4.setText(str(adc0.read()))
+      
+      if (adc0.read()) >= volt:
+        p1.value(0)
+        break
+   #Measuring resistance
+  
+  p3.value(0) #measuring circuit connect
+  
+  
+  for x in range(runOneTime):
+    
+    label6.setText(str(adc1.read()))
+    
+    while 1:
+      
+      label6.setText(str(adc1.read()))
+      
+      if (adc1.read()) >= resist:
+        p3.value(1)
+        
+        #DirPin.value(1)
+        break
+        sleep(1)
+        
+      DirPin.value(0),
+      number_of_runs = 5
+      for x in range(number_of_runs):
+        StepPin.value(1)
+        wait(0.001)
+        StepPin.value(0)
+        #wait(0.001)
+        if x == 5:
+          break
+  
+  wait(2)
+  
+  # Fire  
+  for x in range(runOneTime):  
+    p2.value(1)
+    wait(0.5)
+    p2.value(0)
+    
+    
+  # Motor going up
+
+  DirPin.value(1),
+  for x in range(goUp):
+    StepPin.value(1),
+    sleep(0.001),
+    StepPin.value(0),
+    sleep(0.001),
+    if x == 1000:
+      break
+  
+  ##################################### Step 2 ###############
+  
+  p1.value(1)
+  p2.value(0)
+  
+  
+  # connect relays
+  p3.value(1)
+  
+  
+  #Measuring charge
+  
+  
+  for x in range(runOneTime):
+    
+    label4.setText(str(adc0.read()))
+    
+    while 1:
+      label4.setText(str(adc0.read()))
+      
+      if (adc0.read()) >= volt:
+        p1.value(0)
+        break
+        sleep(1)
+  #Measuring resistance
+  
+  # connect relays
+  p3.value(0)
+  
+  
+  for x in range(runOneTime):
+    
+    label6.setText(str(adc1.read()))
+    
+    while 1:
+      
+      label6.setText(str(adc1.read()))
+      
+      if (adc1.read()) >= resist2:
+        p3.value(1)
+        
+        #DirPin.value(1)
+        break
+      
+      DirPin.value(0),
+      number_of_runs = 5
+      for x in range(number_of_runs):
+        StepPin.value(1)
+        wait(0.001)
+        StepPin.value(0)
+        #wait(0.001)
+        if x == 5:
+          break
+  
+  wait(2)
+  
+  # Fire  
+  for x in range(runOneTime):  
+    p2.value(1)
+    wait(0.5)
+    p2.value(0)
+    
+    
+  # Motor going up
+
+  DirPin.value(1),
+  for x in range(goUp):
+    StepPin.value(1),
+    sleep(0.001),
+    StepPin.value(0),
+    sleep(0.001),
+    if x == 1000:
+      break
+  
+  
+  
+  ################################ Step 3 ###############
+  
+  
+  p1.value(1)
+  p2.value(0)
+  
+  # connect relays
+  p3.value(1)
+  
+  
+  #Measuring charge
+  
+  
+  for x in range(runOneTime):
+    
+    label4.setText(str(adc0.read()))
+    
+    while 1:
+      label4.setText(str(adc0.read()))
+      
+      if (adc0.read()) >= volt:
+        p1.value(0)
+        break
+  
+  #Measuring resistance
+  
+  # connect relays
+  p3.value(0)
+  
+  
+  for x in range(runOneTime):
+    
+    label6.setText(str(adc1.read()))
+    
+    while 1:
+      
+      label6.setText(str(adc1.read()))
+      
+      if (adc1.read()) >= resist3:
+        p3.value(1)
+        
+        #DirPin.value(1)
+        break
+      
+      DirPin.value(0),
+      number_of_runs = 5
+      for x in range(number_of_runs):
+        StepPin.value(1)
+        wait(0.001)
+        StepPin.value(0)
+        #wait(0.001)
+        if x == 5:
+          break
+  
+  wait(2)
+  
+  # Fire  
+  for x in range(runOneTime):  
+    p2.value(1)
+    wait(0.5)
+    p2.value(0)
+    
+    
+  # Motor going up
+
+  DirPin.value(1)
+  for x in range(goUp):
+    StepPin.value(1)
+    sleep(0.001)
+    StepPin.value(0)
+    sleep(0.001)
+    if x == 1000:
+      break
+  
+  ################### Bottom Rod opens #######
+  
+  for x in range(runOneTime):
+    a1.value(0)  # bottom rod open
+  
+    
+    
+  
+  ################### Top Rod goes down ########
+  
+  for x in range(runOneTime):
+    
+    DirPin.value(0)
+    number_of_runs22 = 1000
+    for x in range(number_of_runs22):
+      StepPin.value(1)
+      wait(0.001)
+      StepPin.value(0)
+      #wait(0.001)
+      if x == 1000:
+        break
+      
+  ################### Top Rod goes all the way up ######
+  
+  DirPin.value(1)
+  numberofRuns33 = 5000
+  for x in range(numberofRuns33):
+    StepPin.value(1)
+    sleep(0.001)
+    StepPin.value(0)
+    sleep(0.001)
+    if x == 5000:
+      break
+    
+  ################## Bottom Rod closes ##########
+  
+  
+  a1.value(1)  # bottom rod relay 1 closes
+  
+  label4.setText(str(adc0.read()))
+  label6.setText(str(adc1.read()))
+  
+  wait(0.001) 
+  pass
+btnA.wasPressed(buttonA_wasPressed)
